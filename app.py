@@ -18,7 +18,7 @@ pattern = r":(?P<nick>[^!]*)!(?P<username>[^@]*)@(?P<host>\S+) (?P<command>\w+) 
 
 def check_env_variables():
     required_vars = ['TWITCH_CHANNELS',
-                     'DESTINATION_KAFKA_TOPIC', 'KAFKA_BOOTSTRAP_SERVERS']
+                     'DESTINATION_KAFKA_TOPIC', 'KAFKA_BOOTSTRAP_SERVERS', 'KAFKA_API_VERSION']
     for var in required_vars:
         if not os.getenv(var):
             logger.error(f"Environment variable '{var}' is not set.")
@@ -88,6 +88,8 @@ if not check_env_variables():
 producer = KafkaProducer(
     bootstrap_servers=os.getenv('KAFKA_BOOTSTRAP_SERVERS'),
     acks='all',
+    api_version=tuple(int(x)
+                      for x in os.getenv('KAFKA_API_VERSION').split(","))
 )
 
 logging.info("Kafka Producer connected")
